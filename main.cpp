@@ -11,9 +11,27 @@
 using namespace std;
 using namespace std::chrono;
 
+const int NUM_RUNS = 15;
+const int NUM_OPS = 4;      // Read, Sort, Insert, Delete
+const int NUM_STRUCTS = 3;  // Vector, List, Set
+
 int main() {
-    string fileName = "codes.txt";
-    vector<string> v;
+    // Seed random (if needed)
+    srand(time(0));
+
+    // 3D array: results[run][operation][structure]
+    int results[NUM_RUNS][NUM_OPS][NUM_STRUCTS] = {0};
+    // accumulator array for running totals
+    int accum[NUM_OPS][NUM_STRUCTS] = {0};
+    // names of operations (for reference)
+    string ops[NUM_OPS] = {"Read", "Sort", "Insert", "Delete"};
+
+    vector<string> names;
+    ifstream infile("names.txt");
+    string name;
+    while (infile >> name) names.push_back(name);
+    infile.close();
+
     list<string> l;
     set<string> s;
 
@@ -23,91 +41,86 @@ int main() {
          << setw(10) << "List" 
          << setw(10) << "Set" << endl;
 
-    // first race: READING
-    auto start = high_resolution_clock::now();
-    ifstream f1(fileName); string code;
-    while(f1 >> code) v.push_back(code);
-    f1.close();
-    auto end = high_resolution_clock::now();
-    long long v_read = duration_cast<microseconds>(end - start).count();
+    for (int run = 0; run < NUM_RUNS; ++run) {
+        // --- Vector ---
+        vector<string> v;
 
-    start = high_resolution_clock::now();
-    ifstream f2(fileName);
-    while(f2 >> code) l.push_back(code);
-    f2.close();
-    end = high_resolution_clock::now();
-    long long l_read = duration_cast<microseconds>(end - start).count();
+        auto start = high_resolution_clock::now();
+        v.assign(names.begin(), names.end()); // Read
+        auto end = high_resolution_clock::now();
+        results[run][0][0] = duration_cast<microseconds>(end - start).count();
+        accum[0][0] += results[run][0][0];
 
-    start = high_resolution_clock::now();
-    ifstream f3(fileName);
-    while(f3 >> code) s.insert(code);
-    f3.close();
-    end = high_resolution_clock::now();
-    long long s_read = duration_cast<microseconds>(end - start).count();
+        start = high_resolution_clock::now();
+        sort(v.begin(), v.end()); // Sort
+        end = high_resolution_clock::now();
+        results[run][1][0] = duration_cast<microseconds>(end - start).count();
+        accum[1][0] += results[run][1][0];
 
-    cout << setw(10) << "Read" 
-         << setw(10) << v_read 
-         << setw(10) << l_read 
-         << setw(10) << s_read << endl;
+        start = high_resolution_clock::now();
+        v.push_back("NewName"); // Insert
+        end = high_resolution_clock::now();
+        results[run][2][0] = duration_cast<microseconds>(end - start).count();
+        accum[2][0] += results[run][2][0];
 
-    // second race: SORTING
-    start = high_resolution_clock::now();
-    sort(v.begin(), v.end());
-    end = high_resolution_clock::now();
-    long long v_sort = duration_cast<microseconds>(end - start).count();
+        start = high_resolution_clock::now();
+        v.pop_back(); // Delete
+        end = high_resolution_clock::now();
+        results[run][3][0] = duration_cast<microseconds>(end - start).count();
+        accum[3][0] += results[run][3][0];
 
-    start = high_resolution_clock::now();
-    l.sort();
-    end = high_resolution_clock::now();
-    long long l_sort = duration_cast<microseconds>(end - start).count();
+        // --- List ---
+        list<string> l;
 
-    long long s_sort = -1; // set is already sorted
-    cout << setw(10) << "Sort" 
-         << setw(10) << v_sort 
-         << setw(10) << l_sort 
-         << setw(10) << s_sort << endl;
+        start = high_resolution_clock::now();
+        l.assign(names.begin(), names.end()); // Read
+        end = high_resolution_clock::now();
+        results[run][0][1] = duration_cast<microseconds>(end - start).count();
+        accum[0][1] += results[run][0][1];
 
-    // third race: INSERTING
-    start = high_resolution_clock::now();
-    v.insert(v.begin() + v.size()/2, "TESTCODE");
-    end = high_resolution_clock::now();
-    long long v_ins = duration_cast<microseconds>(end - start).count();
+        start = high_resolution_clock::now();
+        l.sort(); // Sort
+        end = high_resolution_clock::now();
+        results[run][1][1] = duration_cast<microseconds>(end - start).count();
+        accum[1][1] += results[run][1][1];
 
-    start = high_resolution_clock::now();
-    auto itl = l.begin(); advance(itl, l.size()/2); l.insert(itl, "TESTCODE");
-    end = high_resolution_clock::now();
-    long long l_ins = duration_cast<microseconds>(end - start).count();
+        start = high_resolution_clock::now();
+        l.push_back("NewName"); // Insert
+        end = high_resolution_clock::now();
+        results[run][2][1] = duration_cast<microseconds>(end - start).count();
+        accum[2][1] += results[run][2][1];
 
-    start = high_resolution_clock::now();
-    s.insert("TESTCODE");
-    end = high_resolution_clock::now();
-    long long s_ins = duration_cast<microseconds>(end - start).count();
+        start = high_resolution_clock::now();
+        l.pop_back(); // Delete
+        end = high_resolution_clock::now();
+        results[run][3][1] = duration_cast<microseconds>(end - start).count();
+        accum[3][1] += results[run][3][1];
 
-    cout << setw(10) << "Insert"
-         << setw(10) << v_ins 
-         << setw(10) << l_ins 
-         << setw(10) << s_ins << endl;
+        // --- Set ---
+        set<string> s;
 
-    // fourth race: DELETING
-    start = high_resolution_clock::now();
-    v.erase(v.begin() + v.size()/2);
-    end = high_resolution_clock::now();
-    long long v_del = duration_cast<microseconds>(end - start).count();
+        start = high_resolution_clock::now();
+        for (const auto &n : names) s.insert(n); // Read
+        end = high_resolution_clock::now();
+        results[run][0][2] = duration_cast<microseconds>(end - start).count();
+        accum[0][2] += results[run][0][2];
 
-    start = high_resolution_clock::now();
-    itl = l.begin(); advance(itl, l.size()/2); l.erase(itl);
-    end = high_resolution_clock::now();
-    long long l_del = duration_cast<microseconds>(end - start).count();
+        results[run][1][2] = 0; // Set cannot sort
+        accum[1][2] += 0;
 
-    start = high_resolution_clock::now();
-    auto its = s.begin(); advance(its, s.size()/2); s.erase(its);
-    end = high_resolution_clock::now();
-    long long s_del = duration_cast<microseconds>(end - start).count();
+        start = high_resolution_clock::now();
+        s.insert("NewName"); // Insert
+        end = high_resolution_clock::now();
+        results[run][2][2] = duration_cast<microseconds>(end - start).count();
+        accum[2][2] += results[run][2][2];
 
-    cout << setw(10) << "Delete" 
-         << setw(10) << v_del 
-         << setw(10) << l_del 
-         << setw(10) << s_del << endl;
+        start = high_resolution_clock::now();
+        s.erase("NewName"); // Delete
+        end = high_resolution_clock::now();
+        results[run][3][2] = duration_cast<microseconds>(end - start).count();
+        accum[3][2] += results[run][3][2];
+
+    }
 
     return 0;
 }
