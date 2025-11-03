@@ -6,30 +6,13 @@
 #include <list>
 #include <set>
 #include <chrono>
-#include <string>
+#include <algorithm>
+#include <iomanip>
 using namespace std;
 using namespace std::chrono;
 
-const int NUM_RUNS = 15;
-const int NUM_OPS = 4;
-const int NUM_STRUCTS = 3;
-
 int main() {
-    srand(time(0));
-
-    // 3D array: [run][operation][structure]
-    int results[NUM_RUNS][NUM_OPS][NUM_STRUCTS] = {0};
-    int accum[NUM_OPS][NUM_STRUCTS] = {0};
-
-    string ops[NUM_OPS] = {"Read", "Sort", "Insert", "Delete"};
-
-    // read data
-    vector<string> names;
-    ifstream infile("names.txt");
-    string name;
-    while (infile >> name)
-        names.push_back(name);
-    infile.close();
+    string fileName = "codes.txt";
 
     vector<string> v;
     list<string> l;
