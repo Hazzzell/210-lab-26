@@ -115,16 +115,28 @@ int main() {
          << setw(10) << "Vector"
          << setw(10) << "List"
          << setw(10) << "Set" << "\n";
-         
-         for (int op = 0; op < NUM_OPS; ++op) {
-          cout << left << setw(12) << ops[op];
-          for (int ds = 0; ds < NUM_STRUCTS; ++ds) {
+
+    for (int op = 0; op < NUM_OPS; ++op) {
+        cout << left << setw(12) << ops[op];
+        for (int ds = 0; ds < NUM_STRUCTS; ++ds) {
             int avg = accum[op][ds] / NUM_RUNS;
             cout << setw(10) << avg;
-          }
-          cout << "\n";
-     }
+        }
+        cout << "\n";
     }
+        cout << "Number of simulations: " << NUM_RUNS << "\n";
+        cout << left << setw(12) << "Operation"
+         << setw(10) << "Vector"
+         << setw(10) << "List"
+         << setw(10) << "Set" << "\n";
 
+    for (int op = 0; op < NUM_OPS; ++op) {
+        cout << left << setw(12) << ops[op];
+        for (int ds = 0; ds < NUM_STRUCTS; ++ds) {
+            int avg = accum[op][ds] / NUM_RUNS;
+            cout << setw(10) << avg;
+        }
+        cout << "\n";} 
+     }
     return 0;
 }
