@@ -13,7 +13,6 @@ using namespace std::chrono;
 
 int main() {
     string fileName = "codes.txt";
-
     vector<string> v;
     list<string> l;
     set<string> s;
