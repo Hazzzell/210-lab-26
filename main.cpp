@@ -1,4 +1,3 @@
-
 // COMSC-210 | Lab 26 | Keng C Chan
 // IDE used: Visual Studio Code (VS Code)
 #include <iostream>
@@ -7,13 +6,30 @@
 #include <list>
 #include <set>
 #include <chrono>
-#include <algorithm>
-#include <iomanip>
+#include <string>
 using namespace std;
 using namespace std::chrono;
 
+const int NUM_RUNS = 15;
+const int NUM_OPS = 4;
+const int NUM_STRUCTS = 3;
+
 int main() {
-    string fileName = "codes.txt";
+    srand(time(0));
+
+    // 3D array: [run][operation][structure]
+    int results[NUM_RUNS][NUM_OPS][NUM_STRUCTS] = {0};
+    int accum[NUM_OPS][NUM_STRUCTS] = {0};
+
+    string ops[NUM_OPS] = {"Read", "Sort", "Insert", "Delete"};
+
+    // read data
+    vector<string> names;
+    ifstream infile("names.txt");
+    string name;
+    while (infile >> name)
+        names.push_back(name);
+    infile.close();
 
     vector<string> v;
     list<string> l;
@@ -113,11 +129,3 @@ int main() {
 
     return 0;
 }
-
-/* syntax examples:
-auto start = high_resolution_clock::now()
-auto end = high_resolution_clock::now()
-auto duration = duration_cast<milliseconds>(end - start)
-duration.count() references elapsed milliseconds
-*/
-   
